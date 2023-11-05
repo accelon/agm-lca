@@ -11,7 +11,7 @@ const agm=process.argv[2];
 let  files=agm||['agmd','agmm','agms','agmu']
 const processfile=(fn)=>{
     const infn='raw/'+fn+'-lca.txt';
-    const outfn='off/'+fn+'-lca.off';
+    const outfn='off/'+fn+'.lca.off';
     const [regex,endmarker,chunkcount]=Chunkpats[fn]
     let nchunk=0,prev=0;
     let rawcontent=readTextContent(infn);
