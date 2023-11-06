@@ -31,9 +31,12 @@ const processfile=(fn)=>{
     })
     emitchunk(prev);
     const outcontent=tidy(splitlongsentence(tagit(chunks.join('\n'),fn)));
+    // const c=chunks.join('\n');
+    // console.log(c.slice(c.length-100))
     if (nchunk!==chunkcount) {
         console.log('warning chunkcount mismatch',nchunk,'expecting',chunkcount)
     }
+    // console.log(outcontent.slice(outcontent.length-100))
     writeChanged( outfn, outcontent ,true)
 }
 if (typeof files=='string') files=[agm];
