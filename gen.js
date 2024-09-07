@@ -1,6 +1,6 @@
 import {nodefs, writeChanged, readTextContent, patchBuf} from 'ptk/nodebundle.cjs'
 await nodefs;
-import {splitlongsentence,tidy,tagit,Chunkpats} from './src/convertor.js'
+import {statPhrase,replaceEUDC,tidy,tagit,Chunkpats,topaged} from './src/convertor.js'
 import {Errata} from './src/errata.js'
 /*
 prerequisite
@@ -11,7 +11,7 @@ const agm=process.argv[2];
 let  files=agm||['agmd','agmm','agms','agmu']
 const processfile=(fn)=>{
     const infn='raw/'+fn+'-lca.txt';
-    const outfn='off/'+fn+'.lca.off';
+    const outfn='off/'+fn+'-lca.pgd';
     const [regex,endmarker,chunkcount]=Chunkpats[fn]
     let nchunk=0,prev=0;
     let rawcontent=readTextContent(infn);
@@ -30,13 +30,16 @@ const processfile=(fn)=>{
         prev=idx;
     })
     emitchunk(prev);
-    const outcontent=tidy(splitlongsentence(tagit(chunks.join('\n'),fn)));
+    const outcontent=topaged(tidy(replaceEUDC(tagit(chunks.join('\n'),fn))));
     // const c=chunks.join('\n');
     // console.log(c.slice(c.length-100))
     if (nchunk!==chunkcount) {
         console.log('warning chunkcount mismatch',nchunk,'expecting',chunkcount)
     }
     // console.log(outcontent.slice(outcontent.length-100))
+
+    const arr=statPhrase(outcontent).filter(it=>it[0].length>5);
+    console.log(arr.slice(0,20))
     writeChanged( outfn, outcontent ,true)
 }
 if (typeof files=='string') files=[agm];
