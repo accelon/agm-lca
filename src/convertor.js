@@ -58,18 +58,16 @@ const addN=(content,fn)=>{
 const epilog=(content,fn)=>{
     if (fn=='agmd') {
         let pin=0;
-        content='{id:"agmd",title:"長阿含經"}\n'+content.replace(/佛說長阿含經卷第([一二三四五六七八九○十]+)\n/g,(m,m1)=>'^juan'+fromChineseNumber(m1))
+        content='{id:"agmd-lca",title:"長阿含經"}\n'+content.replace(/佛說長阿含經卷第([一二三四五六七八九○十]+)\n/g,(m,m1)=>'^juan'+fromChineseNumber(m1))
         .replace(/_{3,}/g,'')
-        .replace(/ck(\d+)第([一二三四五六七八九十○]+)經 +([^經]+經)/g,(m,ck,cnum,title)=>'ck#d'+ck+'〔'+title+'〕')
+        .replace(/\^ck(\d+)第([一二三四五六七八九十○]+)經 +([^經]+經)/g,(m,ck,cnum,title)=>title+'\t^ck#d'+ck+'〔'+title+'〕')
         .replace(/\n([^品]{2,4}品)第([一二三四五六七八九十○]+)/g,(m,m1,m2)=>{
-             return "\n^ck#d30"+ toBase26(pin++) +'〔'+m1.trim()+'〕';
+             return "\n"+m1+"\t^ck#d30"+ toBase26(pin++) +'〔'+m1.trim()+'〕';
         })
-        .replace(/\n\^ck#d30a〔閻浮提洲品〕/,'閻浮提洲品')
-        .replace('\n','^ak#agmd【長阿含】^bk#agmd〔長阿含〕');
-
+        .replace(/\n閻浮提洲品\t\^ck#d30a〔閻浮提洲品〕/,'\n〔閻浮提洲品〕')
     } else if (fn=='agmm') {
         const refs={}
-        content='{id:"agmm",title:"中阿含經"}\n'+content.replace(/\^ck(\d+)\n（[一二三四五六七八九十○]+）([^【〔\m]*)【([^】\n]+)】/g,(m,ck,title,ref)=>{
+        content='{id:"agmm-lca",title:"中阿含經"}\n'+content.replace(/\^ck(\d+)\n（[一二三四五六七八九十○]+）([^【〔\m]*)【([^】\n]+)】/g,(m,ck,title,ref)=>{
             refs[ck]=ref;
             //console.log(title.length)
             return '^ck#m'+ck+'〔'+title+'〕';
@@ -79,16 +77,12 @@ const epilog=(content,fn)=>{
             //console.log(title)
             return '^ck#m'+ck+'〔'+title+'〕';
         })
-        //append ak bk at first line
-        .replace('\n',"^ak#agmm【中阿含】^bk#agmm〔中阿含〕\n")
-
-
     } else if (fn=='agms') {
         content=process_agms(content);
-        content='{id:"agms",title:"雜阿含經"\n'+content.replace('\n','^ak#agms【雜阿含】^bk#agms〔雜阿含〕')
+        content='{id:"agms-lca",title:"雜阿含經"}\n'+content
     } else if (fn=='agmu') {
-        content='{id:"agmu",title:"增一阿含經"\n'+content.replace(/增壹阿含經卷第([一二三四五六七八九○十]+)/g,(m,m1)=>'^juan'+fromChineseNumber(m1))
-        .replace('\n','^ak#agmu【增一阿含】^bk#agmu〔增一阿含〕')
+        content='{id:"agmu-lca",title:"增一阿含經"}\n'+content.replace(/增壹阿含經卷第([一二三四五六七八九○十]+)/g,(m,m1)=>'^juan'+fromChineseNumber(m1))
+        .replace(/\^ck(\d+)（([一二三四五六七八九十○]+)）/g,"$2\t^ck$1（$2）")
     }
     return content;;
 }
