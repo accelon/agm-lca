@@ -1,4 +1,4 @@
-import { toBase26, fromChineseNumber,cjkPhrases,sortObj} from 'ptk/nodebundle.cjs'
+import { toBase26, fromChineseNumber,cjkPhrases,sortObj,jsonify} from 'ptk/nodebundle.cjs'
 import {eudc} from './eudc.js'
 import {process_agms} from './agms.js';
 export const Chunkpats={
@@ -83,7 +83,7 @@ const epilog=(content,fn)=>{
     } else if (fn=='agmu') {
         content='{id:"agmu-lca",title:"增一阿含"}\n'
         +content.replace(/增壹阿含經卷第([一二三四五六七八九○十]+)/g,(m,m1)=>'^juan'+fromChineseNumber(m1))
-        .replace(/\^ck(\d+)（([一二三四五六七八九十○]+)）/g,"$2\t^ck#u$1（$2）")
+        .replace(/\^ck(\d+)（([一二三四五六七八九十○]+)）/g,"$2\t^ck#u$1〔$2〕")
     }
     return content;;
 }
@@ -91,7 +91,7 @@ export const tagit=(content,fn)=>{
     content=content.replace(/\n?[（\(] ?(\d+[a-z]*)[）\)]/g,(m,m1)=>{
         return '\n^m'+m1.replace(/^0+/g,'');
     })
-    content= epilog(content,fn)
+    content=epilog(content,fn);
     const lines=content.split("\n");
     let ck='';
     for (let i=0;i<lines.length;i++) {
@@ -115,6 +115,31 @@ export const tidy=content=>{
 }
 export const topaged=(content)=>{
     content=content.replace(/\^ck#([\dagms]\d+)〔([^〕]+)〕/g,"$2\t^ck#$1《$2》")
+    return content;
+}
+let prev='';
+export const toMarkdown=content=>{
+    prev='';
+    const at=content.indexOf('\n');
+    const header=jsonify(content.slice(0,at));
+    console.log(header)
+    content=content.slice(at+1);//remove header
+    content= content.replace(/\^ak#agm.【(.+?)】/,'$1')
+    .replace(/\^y.([_\da-z]+)/g,(m,m1)=>{ //move sentence id to end of block
+        const [sutta,sentence] = m1.split('_');
+        const r=prev? (prev+'\n'):'\n';
+        prev='^'+sutta+(sentence?'-'+sentence:'');
+        return r;
+    })
+    .replace(/\n\^(\d+)-([a-z\d]+)/g,' ^$1-$2\n')
+    .replace(/(\n?).+?\t\^ck#([a-z\d]+)〔(.+?)〕/g,'$1## $3 ^$2')
+    .replace(/\^ck#([a-z\d]+)〔(.+?)〕/g,'## $2 ^$1') //有些還沒name paged
+    .replace(/\^bk#agm(.)〔(.+?)〕/,'\n# $2 ^agm$1')
+//move last block id to upper line
+    .replace(/\n(.+?)(\^[a-z]\d+) (\^[\d\-]+)/g, '$3\n\n$1$2')
+    .replace(/\n +/g,'\n')
+
+    content='# '+header.title+'\n'+content;
     return content;
 }
 
