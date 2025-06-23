@@ -98,7 +98,7 @@ export const tagit=(content,fn)=>{
         const m=lines[i].match(/\^ck#([dmsu]\d+)/);
         const m2=lines[i].match(/\^m(\d+[a-z]*)/);
         if (m) ck=m[1];
-        else if (m2) {
+        if (m2) {
             lines[i]=lines[i].replace(/\^m(\d+[a-z]*) */,'^y'+ck+'_'+m2[1]+' ');
         }
     }
@@ -124,7 +124,9 @@ export const toMarkdown=content=>{
     const header=jsonify(content.slice(0,at));
     console.log(header)
     content=content.slice(at+1);//remove header
-    content= content.replace(/\^ak#agm.【(.+?)】/,'$1')
+    content= content
+    // .replace(/\^m\d+/g,'')
+    .replace(/\^ak#agm.【(.+?)】/,'$1')
     .replace(/\^y.([_\da-z]+)/g,(m,m1)=>{ //move sentence id to end of block
         const [sutta,sentence] = m1.split('_');
         const r=prev? (prev+'\n'):'\n';
@@ -136,8 +138,9 @@ export const toMarkdown=content=>{
     .replace(/\^ck#([a-z\d]+)〔(.+?)〕/g,'## $2 ^$1') //有些還沒name paged
     .replace(/\^bk#agm(.)〔(.+?)〕/,'\n# $2 ^agm$1')
 //move last block id to upper line
-    .replace(/\n(.+?)(\^[a-z]\d+) (\^[\d\-]+)/g, '$3\n\n$1$2')
+    .replace(/\n(.+?)(\^[a-z]\d+) ?(\^[\d\-]+)/g, '$3\n\n$1$2')
     .replace(/\n +/g,'\n')
+     .replace(/\^s(\d+)\n/g,'^s$1\n\n')//make sure sutta name is a block
 
     content='# '+header.title+'\n'+content;
     return content;
