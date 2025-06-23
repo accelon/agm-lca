@@ -140,7 +140,7 @@ export const toMarkdown=content=>{
 //move last block id to upper line
     .replace(/\n(.+?)(\^[a-z]\d+) ?(\^[\d\-]+)/g, '$3\n\n$1$2')
     .replace(/\n +/g,'\n')
-     .replace(/\^s(\d+)\n/g,'^s$1\n\n')//make sure sutta name is a block
+     .replace(/\^s(\d+)\n+/g,'^s$1\n\n')//make sure sutta name is a block
 
     content='# '+header.title+'\n'+content;
     return content;
