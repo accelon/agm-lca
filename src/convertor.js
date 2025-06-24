@@ -142,7 +142,7 @@ export const toMarkdown=content=>{
     .replace(/\n +/g,'\n')
      .replace(/\^s(\d+)\n+/g,'^s$1\n\n')//make sure sutta name is a block
 
-    content='# '+header.title+'\n'+content;
+    content='# '+header.title+'\n'+content.trim()+' '+prev;
     return content;
 }
 

@@ -1,4 +1,4 @@
-import {nodefs, writeChanged, readTextContent, patchBuf} from 'ptk/nodebundle.cjs'
+import {nodefs, writeChanged, readTextContent, patchBuf} from './nodebundle.cjs'
 await nodefs;
 import {statPhrase,replaceEUDC,tidy,tagit,Chunkpats,topaged} from './src/convertor.js'
 import {Errata} from './src/errata.js'
